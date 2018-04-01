@@ -196,7 +196,7 @@ function draw(gl, programInfo, tunnelInfo) {
 function makeTunnel(_position, _dirVector) {
 	this.position = _position;
 	this.dirVector = _dirVector;
-	this.rotation = Math.floor(Math.random()*8) * (Math.PI/4);
+	this.rotation = Math.floor(Math.random()*8) * (Math.PI/2);
 
 	this.rotVector1 = glm.vec3.fromValues(0, -1, 0);
 	this.rotAngle1 = Math.atan2(_dirVector[2], _dirVector[0]) + Math.PI/2;

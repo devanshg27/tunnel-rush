@@ -215,6 +215,8 @@ function makeTunnel(_position, _dirVector) {
 
 	this.perDirVector = glm.vec3.fromValues(0, 1, 0);
 	glm.vec3.transformMat4(this.perDirVector, this.perDirVector, tempRot);
+	this.normVector = glm.vec3.create();
+	glm.vec3.cross(this.normVector, this.dirVector, this.perDirVector);
 }
 
 function getPosition(tunnelInfo, ang) {
@@ -224,9 +226,30 @@ function getPosition(tunnelInfo, ang) {
 	return ans;
 }
 
+function getForwardDirection(tunnelInfo, ang) {
+	var ans = glm.vec3.create();
+	const tempRot = glm.mat4.create();
+	glm.mat4.identity(tempRot);
+	glm.mat4.rotate(tempRot, tempRot, ang*Math.PI/180, tunnelInfo.normVector);
+	glm.vec3.transformMat4(ans, tunnelInfo.dirVector, tempRot);
+	return ans;
+}
+
+function getUpDirection(tunnelInfo, ang, ang2) {
+	var ans = glm.vec3.create();
+	const tempRot = glm.mat4.create();
+	glm.mat4.identity(tempRot);
+	glm.mat4.rotate(tempRot, tempRot, ang*Math.PI/180, tunnelInfo.normVector);
+	glm.mat4.rotate(tempRot, tempRot, ang2, tunnelInfo.dirVector);
+	glm.vec3.transformMat4(ans, tunnelInfo.perDirVector, tempRot);
+	return ans;
+}
+
 module.exports = {
 	initBuffers,
 	makeTunnel,
 	draw,
 	getPosition,
+	getForwardDirection,
+	getUpDirection,
 }

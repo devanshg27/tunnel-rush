@@ -54,7 +54,7 @@ else {
 	requestAnimationFrame(render);
 }
 
-var cameraPosition = 0;
+var cameraPosition = 0, cameraAngle = 0;
 
 //
 // Draw the scene.
@@ -76,7 +76,7 @@ function drawScene(gl, programInfo, deltaTime) {
 	// and we only want to see objects between 0.1 units
 	// and 100 units away from the camera.
 
-	const fieldOfView = 45 * Math.PI / 180;   // in radians
+	const fieldOfView = 90 * Math.PI / 180;   // in radians
 	const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 	const zNear = 0.1;
 	const zFar = 1000.0;
@@ -91,7 +91,16 @@ function drawScene(gl, programInfo, deltaTime) {
 									 zNear,
 									 zFar);
 
-	glm.mat4.lookAt(tempMatrix, tunnelHelper.getPosition(tunnel1, cameraPosition), tunnelHelper.getPosition(tunnel1, cameraPosition+0.25), [0,1,0]);
+	var curCentre = tunnelHelper.getPosition(tunnel1, cameraPosition);
+	var nxtCentre = glm.vec3.create();
+	var ForwardDir = glm.vec3.create();
+	ForwardDir = tunnelHelper.getForwardDirection(tunnel1, cameraPosition);
+	var RadialDir = tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle);
+	var cameraPos = glm.vec3.create();
+	glm.vec3.scaleAndAdd(cameraPos, curCentre, RadialDir, 3.5);
+	glm.vec3.add(nxtCentre, cameraPos, ForwardDir);
+	glm.mat4.lookAt(tempMatrix, cameraPos, nxtCentre, [curCentre[0] - cameraPos[0], curCentre[1] - cameraPos[1], curCentre[2] - cameraPos[2]]);
+	// glm.mat4.lookAt(tempMatrix, [0, 0, 300], [0, 0, -6], [0, 1, 0]);
 	glm.mat4.multiply(projectionMatrix, projectionMatrix, tempMatrix);
 
 	gl.useProgram(programInfo.program);
@@ -108,8 +117,15 @@ function drawScene(gl, programInfo, deltaTime) {
 
 	// Update the rotation for the next draw
 
-	cameraPosition += 40*deltaTime;
+	cameraPosition += 30*deltaTime;
 	if(cameraPosition >= 90) {
+		var tempDiff = glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle));
+		if(glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle - tempDiff)) < glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle + tempDiff))) {
+			cameraAngle -= tempDiff;
+		}
+		else {
+			cameraAngle += tempDiff;
+		}
 		cameraPosition = cameraPosition - 90;
 		tunnel1 = tunnel2;
 		tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);

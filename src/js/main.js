@@ -7,6 +7,7 @@ var tunnelHelper = require('./tunnel.js');
 var cubeHelper = require('./cube.js');
 var tunnel1, tunnel2;
 var obstacle1, placedObstacle = false;
+var Score = 0, Level = 1;
 
 const canvas = document.getElementById('canvas');
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -157,10 +158,16 @@ function drawScene(gl, programInfo, deltaTime) {
 		tunnel1 = tunnel2;
 		tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);
 		placedObstacle = false;
+		Score += 1;
+		if(Score == Level * 5) {
+			Level += 1;
+			if(Level == 5) Level = 4;
+		}
 	}
 	if(!placedObstacle && cameraPosition >= 2) {
 		placedObstacle = true;
-		obstacle1 = new cubeHelper.makeCube(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector, Math.floor(Math.random()*4));
+		obstacle1 = new cubeHelper.makeCube(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector, Math.floor(Math.random()*Level));
+		document.getElementById("info").innerHTML = 'Score: ' + Score + '<br/>Level:' + Level;
 	}
 	radius += radiusVel;
 	radiusVel += 0.02;

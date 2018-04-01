@@ -128,7 +128,7 @@ function drawScene(gl, programInfo, deltaTime) {
 		gl.uniform1i(programInfo.uniformLocations.grFlag, 0);
 	}
 	if(60 <= cameraPosition && cameraPosition <= 80) {
-		gl.uniform1f(programInfo.uniformLocations.vFlash, 2 - ((cameraPosition-70))/70);
+		gl.uniform1f(programInfo.uniformLocations.vFlash, 2 - Math.abs((cameraPosition-60))/20);
 	}
 	else {
 		gl.uniform1f(programInfo.uniformLocations.vFlash, 1);

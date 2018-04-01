@@ -137,7 +137,17 @@ function draw(gl, programInfo, cubeInfo) {
 	glm.mat4.rotate(modelViewMatrix,  // destination matrix
 							modelViewMatrix,  // matrix to rotate
 							cubeInfo.rotation,     // amount to rotate in radians
-							[0, 0, 1]);       // axis to rotate around (Z)
+							cubeInfo.dirVector);       // axis to rotate around (Z)
+
+	glm.mat4.rotate(modelViewMatrix,  // destination matrix
+							modelViewMatrix,  // matrix to rotate
+							cubeInfo.rotAngle1,     // amount to rotate in radians
+							cubeInfo.rotVector1);       // axis to rotate around (Z)
+
+	glm.mat4.rotate(modelViewMatrix,  // destination matrix
+							modelViewMatrix,  // matrix to rotate
+							cubeInfo.rotAngle2,     // amount to rotate in radians
+							cubeInfo.rotVector2);       // axis to rotate around (Z)
 
 	glm.mat4.scale(modelViewMatrix, modelViewMatrix, cubeInfo.scale);
 
@@ -199,11 +209,21 @@ function draw(gl, programInfo, cubeInfo) {
 	}
 }
 
-function makeCube(_position, _rotation, _scale, _angularSpeed) {
+function makeCube(_position, _dirVector, _rotation, _scale, _angularSpeed) {
     this.position = _position;
     this.rotation = _rotation;
     this.scale = _scale;
     this.angularSpeed = _angularSpeed;
+    this.dirVector = _dirVector;
+
+    this.rotVector1 = glm.vec3.fromValues(0, -1, 0);
+	this.rotAngle1 = Math.atan2(_dirVector[2], _dirVector[0]) + Math.PI/2;
+	if(Math.abs(_dirVector[0]) + Math.abs(_dirVector[2]) < 0.01) {
+		this.rotAngle1 = 0;
+	}
+
+	this.rotVector2 = glm.vec3.fromValues(-1, 0, 0);
+	this.rotAngle2 = Math.acos(_dirVector[1]/glm.vec3.length(_dirVector)) - Math.PI/2;
 }
 
 module.exports = {

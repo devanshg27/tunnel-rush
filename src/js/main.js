@@ -43,7 +43,7 @@ else {
 	tunnel1 = new tunnelHelper.makeTunnel([0, 0, -6], glm.vec3.fromValues(0, 0, -1));
 	tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);
 
-	obstacle1 = new cubeHelper.makeCube([0, 0, 100], 0, [7, 1, 1], 0);
+	obstacle1 = new cubeHelper.makeCube([0, 0, 100], [0, 1, 0], 0, [7, 1, 1], 0);
 
 	// Draw the scene repeatedly
 	var then = 0;
@@ -140,7 +140,7 @@ function drawScene(gl, programInfo, deltaTime) {
 	}
 	if(!placedObstacle && cameraPosition >= 2) {
 		placedObstacle = true;
-		obstacle1 = new cubeHelper.makeCube(tunnelHelper.getPosition(tunnel1, 90), 0, [7, 1, 1], 0);
+		obstacle1 = new cubeHelper.makeCube(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector, 0, [7, 1, 1], 0);
 	}
 	radius += radiusVel;
 	radiusVel += 0.02;

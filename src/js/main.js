@@ -33,6 +33,7 @@ else {
 			projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
 			modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
 			uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
+			grFlag: gl.getUniformLocation(shaderProgram, 'grFlag'),
 		},
 	};
 
@@ -117,6 +118,13 @@ function drawScene(gl, programInfo, deltaTime) {
 			programInfo.uniformLocations.projectionMatrix,
 			false,
 			projectionMatrix);
+
+	if(currentlyPressedKeys[66]) {
+		gl.uniform1i(programInfo.uniformLocations.grFlag, 1);
+    }
+	else {
+		gl.uniform1i(programInfo.uniformLocations.grFlag, 0);
+	}
 
 	cubeHelper.draw(gl, programInfo, obstacle1);
 	tunnelHelper.draw(gl, programInfo, tunnel1);

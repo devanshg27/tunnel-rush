@@ -318,15 +318,15 @@ function makeCube(_position, _dirVector, _type) {
 	}
 	else if(_type == 2) {
 		this.rotation = Math.random()*2*Math.PI;
-		this.scale = [7, 3.2, 1];
+		this.scale = [7, 4, 1];
 		this.angularSpeed = 0;
-		this.displaced = -1.5 + Math.random() * 3;
+		this.displaced = -2 + Math.random() * 4;
 	}
 	else if(_type == 3) {
 		this.rotation = Math.random()*2*Math.PI;
-		this.scale = [7, 3.2, 1];
+		this.scale = [7, 4, 1];
 		this.angularSpeed = Math.PI/4;
-		this.displaced = -1.5 + Math.random() * 3;
+		this.displaced = -2 + Math.random() * 4;
 	}
 
 	this.dirVector = _dirVector;

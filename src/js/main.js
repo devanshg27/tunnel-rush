@@ -37,7 +37,7 @@ else {
 	// objects we'll be drawing.
 
 	tunnelHelper.initBuffers(gl);
-	tunnel1 = new tunnelHelper.makeTunnel([0, 0, -6], [0, 0, -1]);
+	tunnel1 = new tunnelHelper.makeTunnel([0, 0, -6], glm.vec3.fromValues(0, 0, -1));
 	tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);
 
 	// Draw the scene repeatedly

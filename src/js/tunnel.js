@@ -127,8 +127,13 @@ function draw(gl, programInfo, tunnelInfo) {
 
 	glm.mat4.rotate(modelViewMatrix,  // destination matrix
 							modelViewMatrix,  // matrix to rotate
-							tunnelInfo.rotAngle,     // amount to rotate in radians
-							tunnelInfo.rotVector);       // axis to rotate around (Z)
+							tunnelInfo.rotAngle1,     // amount to rotate in radians
+							tunnelInfo.rotVector1);       // axis to rotate around (Z)
+
+	glm.mat4.rotate(modelViewMatrix,  // destination matrix
+							modelViewMatrix,  // matrix to rotate
+							tunnelInfo.rotAngle2,     // amount to rotate in radians
+							tunnelInfo.rotVector2);       // axis to rotate around (Z)
 
 	// Tell WebGL how to pull out the positions from the position
 	// buffer into the vertexPosition attribute
@@ -193,17 +198,20 @@ function makeTunnel(_position, _dirVector) {
 	this.dirVector = _dirVector;
 	this.rotation = Math.floor(Math.random()*8) * (Math.PI/4);
 
-	this.rotVector = glm.vec3.create();
-	glm.vec3.cross(this.rotVector, [0, 0, -1], _dirVector);
-	if(glm.vec3.squaredLength(this.rotVector) < 0.01) {
-		this.rotVector = glm.vec3.fromValues(1, 0, 0);
+	this.rotVector1 = glm.vec3.fromValues(0, -1, 0);
+	this.rotAngle1 = Math.atan2(_dirVector[2], _dirVector[0]) + Math.PI/2;
+	if(Math.abs(_dirVector[0]) + Math.abs(_dirVector[2]) < 0.01) {
+		this.rotAngle1 = 0;
 	}
-	this.rotAngle = glm.vec3.angle([0, 0, -1], _dirVector);
+
+	this.rotVector2 = glm.vec3.fromValues(-1, 0, 0);
+	this.rotAngle2 = Math.acos(_dirVector[1]/glm.vec3.length(_dirVector)) - Math.PI/2;
 
 	const tempRot = glm.mat4.create();
 	glm.mat4.identity(tempRot);
 	glm.mat4.rotate(tempRot, tempRot, this.rotation, this.dirVector);
-	glm.mat4.rotate(tempRot, tempRot, this.rotAngle, this.rotVector);
+	glm.mat4.rotate(tempRot, tempRot, this.rotAngle1, this.rotVector1);
+	glm.mat4.rotate(tempRot, tempRot, this.rotAngle2, this.rotVector2);
 
 	this.perDirVector = glm.vec3.fromValues(0, 1, 0);
 	glm.vec3.transformMat4(this.perDirVector, this.perDirVector, tempRot);

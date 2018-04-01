@@ -43,7 +43,7 @@ else {
 	tunnel1 = new tunnelHelper.makeTunnel([0, 0, -6], glm.vec3.fromValues(0, 0, -1));
 	tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);
 
-	obstacle1 = new cubeHelper.makeCube([0, 0, 100], [0, 1, 0], 0, [7, 1, 1], 0);
+	obstacle1 = new cubeHelper.makeCube([0, 0, 100], [0, 1, 0], 0, [7, 1, 1], 0, 0);
 
 	// Draw the scene repeatedly
 	var then = 0;
@@ -59,7 +59,7 @@ else {
 	requestAnimationFrame(render);
 }
 
-var cameraPosition = 0, cameraAngle = 0, radius = 3.8, radiusVel = 0;
+var cameraPosition = 0, cameraAngle = 0, radius = 3.8, radiusVel = 0, cameraPosSpeed = 30;
 var currentlyPressedKeys = {};
 //
 // Draw the scene.
@@ -124,7 +124,11 @@ function drawScene(gl, programInfo, deltaTime) {
 	obstacle1.rotation += obstacle1.angularSpeed * deltaTime;
 	// Update the rotation for the next draw
 
-	cameraPosition += 30*deltaTime;
+	if(cubeHelper.isColliding(cameraPos, curCentre, ForwardDir, obstacle1)) {
+		cameraPosSpeed = 0;
+	}
+
+	cameraPosition += cameraPosSpeed*deltaTime;
 	if(cameraPosition >= 90) {
 		var tempDiff = glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle));
 		if(glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle - tempDiff)) < glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle + tempDiff))) {
@@ -140,16 +144,16 @@ function drawScene(gl, programInfo, deltaTime) {
 	}
 	if(!placedObstacle && cameraPosition >= 2) {
 		placedObstacle = true;
-		obstacle1 = new cubeHelper.makeCube(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector, 0, [7, 1, 1], 0);
+		obstacle1 = new cubeHelper.makeCube(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector, Math.floor(Math.random()*4));
 	}
 	radius += radiusVel;
 	radiusVel += 0.02;
 	if(radius >= 3.8) radius = 3.8;
-	if (currentlyPressedKeys[37]) {
+	if (cameraPosSpeed > 1 && currentlyPressedKeys[37]) {
 		// Left cursor key
 		cameraAngle -= -0.02;
     }
-    if (currentlyPressedKeys[39]) {
+    if (cameraPosSpeed > 1 && currentlyPressedKeys[39]) {
 		// Right cursor key
 		cameraAngle += -0.02;
     }

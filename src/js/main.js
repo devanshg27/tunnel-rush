@@ -145,7 +145,7 @@ function drawScene(gl, programInfo, deltaTime) {
 		cameraPosSpeed = 0;
 	}
 
-	cameraPosition += cameraPosSpeed*deltaTime;
+	cameraPosition += (1 + Level/4)*cameraPosSpeed*deltaTime;
 	if(cameraPosition >= 90) {
 		var tempDiff = glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle));
 		if(glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle - tempDiff)) < glm.vec3.angle(tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle), tunnelHelper.getUpDirection(tunnel2, cameraPosition-90, cameraAngle + tempDiff))) {

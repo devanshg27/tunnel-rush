@@ -4,7 +4,9 @@ import fragShaderSource from 'shaders/fragment_shader.glsl';
 var shaders = require('./shader.js');
 var glm = require('gl-matrix');
 var tunnelHelper = require('./tunnel.js');
+var cubeHelper = require('./cube.js');
 var tunnel1, tunnel2;
+var obstacle1, placedObstacle = false;
 
 const canvas = document.getElementById('canvas');
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -37,8 +39,11 @@ else {
 	// objects we'll be drawing.
 
 	tunnelHelper.initBuffers(gl);
+	cubeHelper.initBuffers(gl);
 	tunnel1 = new tunnelHelper.makeTunnel([0, 0, -6], glm.vec3.fromValues(0, 0, -1));
 	tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);
+
+	obstacle1 = new cubeHelper.makeCube([0, 0, 100], 0, [7, 1, 1], 0);
 
 	// Draw the scene repeatedly
 	var then = 0;
@@ -112,9 +117,11 @@ function drawScene(gl, programInfo, deltaTime) {
 			false,
 			projectionMatrix);
 
+	cubeHelper.draw(gl, programInfo, obstacle1);
 	tunnelHelper.draw(gl, programInfo, tunnel1);
 	tunnelHelper.draw(gl, programInfo, tunnel2);
 
+	obstacle1.rotation += obstacle1.angularSpeed * deltaTime;
 	// Update the rotation for the next draw
 
 	cameraPosition += 30*deltaTime;
@@ -129,5 +136,10 @@ function drawScene(gl, programInfo, deltaTime) {
 		cameraPosition = cameraPosition - 90;
 		tunnel1 = tunnel2;
 		tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);
+		placedObstacle = false;
+	}
+	if(!placedObstacle && cameraPosition >= 2) {
+		placedObstacle = true;
+		obstacle1 = new cubeHelper.makeCube(tunnelHelper.getPosition(tunnel1, 90), 0, [7, 1, 1], 0);
 	}
 }

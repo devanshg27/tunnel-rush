@@ -68,12 +68,12 @@ function initBuffers(gl) {
 	// for each face.
 
 	const faceColors = [
-		[1.0,  1.0,  1.0,  1.0],    // Front face: white
+		[1.0,  0.0,  0.0,  1.0],    // Front face: white
 		[1.0,  0.0,  0.0,  1.0],    // Back face: red
-		[0.0,  1.0,  0.0,  1.0],    // Top face: green
-		[0.0,  0.0,  1.0,  1.0],    // Bottom face: blue
-		[1.0,  1.0,  0.0,  1.0],    // Right face: yellow
-		[1.0,  0.0,  1.0,  1.0],    // Left face: purple
+		[1.0,  0.0,  0.0,  1.0],    // Top face: green
+		[1.0,  0.0,  0.0,  1.0],    // Bottom face: blue
+		[1.0,  0.0,  0.0,  1.0],    // Right face: yellow
+		[1.0,  0.0,  0.0,  1.0],    // Left face: purple
 	];
 
 	// Convert the array of colors into a table for all the vertices.
@@ -139,6 +139,8 @@ function draw(gl, programInfo, cubeInfo) {
 							cubeInfo.rotation,     // amount to rotate in radians
 							[0, 0, 1]);       // axis to rotate around (Z)
 
+	glm.mat4.scale(modelViewMatrix, modelViewMatrix, cubeInfo.scale);
+
 	// Tell WebGL how to pull out the positions from the position
 	// buffer into the vertexPosition attribute
 	{
@@ -197,9 +199,11 @@ function draw(gl, programInfo, cubeInfo) {
 	}
 }
 
-function makeCube(_position, _rotation) {
+function makeCube(_position, _rotation, _scale, _angularSpeed) {
     this.position = _position;
     this.rotation = _rotation;
+    this.scale = _scale;
+    this.angularSpeed = _angularSpeed;
 }
 
 module.exports = {

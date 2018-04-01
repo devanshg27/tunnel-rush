@@ -3,8 +3,8 @@ import fragShaderSource from 'shaders/fragment_shader.glsl';
 
 var shaders = require('./shader.js');
 var glm = require('gl-matrix');
-var cubeHelper = require('./cube.js');
-var cube1, cube2;
+var tunnelHelper = require('./tunnel.js');
+var tunnel1, tunnel2;
 
 const canvas = document.getElementById('canvas');
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -35,9 +35,10 @@ else {
 
 	// Here's where we call the routine that builds all the
 	// objects we'll be drawing.
-	cubeHelper.initBuffers(gl);
-	cube1 = new cubeHelper.makeCube([0, 0, -6], 0);
-	cube2 = new cubeHelper.makeCube([1, 1, -6], 0);
+
+	tunnelHelper.initBuffers(gl);
+	tunnel1 = new tunnelHelper.makeTunnel([0, 0, -6], [0, 0, -1]);
+	tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);
 
 	// Draw the scene repeatedly
 	var then = 0;
@@ -53,7 +54,7 @@ else {
 	requestAnimationFrame(render);
 }
 
-var cubeRotation = 0;
+var cameraPosition = 0;
 
 //
 // Draw the scene.
@@ -90,7 +91,7 @@ function drawScene(gl, programInfo, deltaTime) {
 									 zNear,
 									 zFar);
 
-	glm.mat4.lookAt(tempMatrix, [0, 0, cubeRotation], [0,0,1], [0,1,0]);
+	glm.mat4.lookAt(tempMatrix, tunnelHelper.getPosition(tunnel1, cameraPosition), tunnelHelper.getPosition(tunnel1, cameraPosition+0.25), [0,1,0]);
 	glm.mat4.multiply(projectionMatrix, projectionMatrix, tempMatrix);
 
 	gl.useProgram(programInfo.program);
@@ -102,10 +103,15 @@ function drawScene(gl, programInfo, deltaTime) {
 			false,
 			projectionMatrix);
 
-	cubeHelper.draw(gl, programInfo, cube1);
-	cubeHelper.draw(gl, programInfo, cube2);
+	tunnelHelper.draw(gl, programInfo, tunnel1);
+	tunnelHelper.draw(gl, programInfo, tunnel2);
 
 	// Update the rotation for the next draw
 
-	cubeRotation += deltaTime;
+	cameraPosition += 40*deltaTime;
+	if(cameraPosition >= 90) {
+		cameraPosition = cameraPosition - 90;
+		tunnel1 = tunnel2;
+		tunnel2 = new tunnelHelper.makeTunnel(tunnelHelper.getPosition(tunnel1, 90), tunnel1.perDirVector);
+	}
 }

@@ -34,6 +34,7 @@ else {
 			modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
 			uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
 			grFlag: gl.getUniformLocation(shaderProgram, 'grFlag'),
+			vFlash: gl.getUniformLocation(shaderProgram, 'vFlash'),
 		},
 	};
 
@@ -121,9 +122,15 @@ function drawScene(gl, programInfo, deltaTime) {
 
 	if(currentlyPressedKeys[66]) {
 		gl.uniform1i(programInfo.uniformLocations.grFlag, 1);
-    }
+	}
 	else {
 		gl.uniform1i(programInfo.uniformLocations.grFlag, 0);
+	}
+	if(60 <= cameraPosition && cameraPosition <= 80) {
+		gl.uniform1f(programInfo.uniformLocations.vFlash, 2 - ((cameraPosition-70))/70);
+	}
+	else {
+		gl.uniform1f(programInfo.uniformLocations.vFlash, 1);
 	}
 
 	cubeHelper.draw(gl, programInfo, obstacle1);

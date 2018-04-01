@@ -3,16 +3,72 @@ var buffers;
 const ellipseRatio = 1, bigR = 50;
 
 //
+// Initialize a texture and load an image.
+// When the image finished loading copy it into the texture.
+//
+function loadTexture(gl, url) {
+	const texture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+
+	// Because images have to be download over the internet
+	// they might take a moment until they are ready.
+	// Until then put a single pixel in the texture so we can
+	// use it immediately. When the image has finished downloading
+	// we'll update the texture with the contents of the image.
+	const level = 0;
+	const internalFormat = gl.RGBA;
+	const width = 1;
+	const height = 1;
+	const border = 0;
+	const srcFormat = gl.RGBA;
+	const srcType = gl.UNSIGNED_BYTE;
+	const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
+	gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+								width, height, border, srcFormat, srcType,
+								pixel);
+
+	const image = new Image();
+	image.onload = function() {
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+									srcFormat, srcType, image);
+
+		// WebGL1 has different requirements for power of 2 images
+		// vs non power of 2 images so check if the image is a
+		// power of 2 in both dimensions.
+		if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+			 // Yes, it's a power of 2. Generate mips.
+			 gl.generateMipmap(gl.TEXTURE_2D);
+		} else {
+			 // No, it's not a power of 2. Turn of mips and set
+			 // wrapping to clamp to edge
+			 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+			 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		}
+	};
+	image.src = url;
+
+	return texture;
+}
+
+function isPowerOf2(value) {
+	return (value & (value - 1)) == 0;
+}
+
+//
 // initBuffers
 //
 // Initialize the buffers we'll need. For this demo, we just
 // have one object -- a simple three-dimensional cube.
 //
+var texture;
 function initBuffers(gl) {
 
 	// Create a buffer for the cube's vertex positions.
 
 	const positionBuffer = gl.createBuffer();
+	texture = loadTexture(gl, 'assets/cubetexture.png');
 
 	// Select the positionBuffer as the one to apply buffer
 	// operations to from here out.
@@ -22,7 +78,7 @@ function initBuffers(gl) {
 	// Now create an array of positions for the cube.
 
 	const positions = new Array(12*8*20);
-	const colors = new Array(16*8*20);
+	const texCods = new Array(8*8*20);
 	const ang = (90*(Math.PI/180))/20;
 
 	for (var i = 0; i < 20; i++) {
@@ -44,25 +100,19 @@ function initBuffers(gl) {
 			positions[12*(i*8 + j) + 11] = -(ellipseRatio*bigR+5*Math.sin((j*Math.PI/4)+Math.PI/8))*Math.cos(-Math.PI/2 + ang * (i + 1));
 
 
-			colors[16*(i*8 + j) + 0] = ((i+j)%2);
-			colors[16*(i*8 + j) + 1] = ((i+j)%2);
-			colors[16*(i*8 + j) + 2] = ((i+j)%2);
-			colors[16*(i*8 + j) + 3] = 1.0;
+			var tempX = Math.floor(Math.random()*3)/3;
+			var tempY = Math.floor(Math.random()*3)/3;
+			texCods[8*(i*8 + j) + 0] = tempX+0.1;
+			texCods[8*(i*8 + j) + 1] = tempY+0.1;
 
-			colors[16*(i*8 + j) + 4] = ((i+j)%2);
-			colors[16*(i*8 + j) + 5] = ((i+j)%2);
-			colors[16*(i*8 + j) + 6] = ((i+j)%2);
-			colors[16*(i*8 + j) + 7] = 1.0;
+			texCods[8*(i*8 + j) + 2] = tempX+1/3-0.1;
+			texCods[8*(i*8 + j) + 3] = tempY+0.1;
 
-			colors[16*(i*8 + j) + 8] = ((i+j)%2);
-			colors[16*(i*8 + j) + 9] = ((i+j)%2);
-			colors[16*(i*8 + j) + 10] = ((i+j)%2);
-			colors[16*(i*8 + j) + 11] = 1.0;
+			texCods[8*(i*8 + j) + 4] = tempX+0.1;
+			texCods[8*(i*8 + j) + 5] = tempY+1/3-0.1;
 
-			colors[16*(i*8 + j) + 12] = ((i+j)%2);
-			colors[16*(i*8 + j) + 13] = ((i+j)%2);
-			colors[16*(i*8 + j) + 14] = ((i+j)%2);
-			colors[16*(i*8 + j) + 15] = 1.0;
+			texCods[8*(i*8 + j) + 6] = tempX+1/3-0.1;
+			texCods[8*(i*8 + j) + 7] = tempY+1/3-0.1;
 		}
 	}
 
@@ -75,9 +125,9 @@ function initBuffers(gl) {
 	// Now set up the colors for the faces. We'll use solid colors
 	// for each face.
 
-	const colorBuffer = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+	const textureCoordBuffer = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCods), gl.STATIC_DRAW);
 
 	// Build the element array buffer; this specifies the indices
 	// into the vertex arrays for each face's vertices.
@@ -102,7 +152,7 @@ function initBuffers(gl) {
 
 	buffers = {
 		position: positionBuffer,
-		color: colorBuffer,
+		textureCoord: textureCoordBuffer,
 		indices: indexBuffer,
 		length: indices.length,
 	};
@@ -155,25 +205,24 @@ function draw(gl, programInfo, tunnelInfo) {
 				programInfo.attribLocations.vertexPosition);
 	}
 
-	// Tell WebGL how to pull out the colors from the color buffer
-	// into the vertexColor attribute.
 	{
-		const numComponents = 4;
+		const numComponents = 2;
 		const type = gl.FLOAT;
 		const normalize = false;
 		const stride = 0;
 		const offset = 0;
-		gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
 		gl.vertexAttribPointer(
-				programInfo.attribLocations.vertexColor,
-				numComponents,
-				type,
-				normalize,
-				stride,
-				offset);
+			programInfo.attribLocations.textureCoord,
+			numComponents,
+			type,
+			normalize,
+			stride,
+			offset);
 		gl.enableVertexAttribArray(
-				programInfo.attribLocations.vertexColor);
+			programInfo.attribLocations.textureCoord);
 	}
+
 
 	// Tell WebGL which indices to use to index the vertices
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
@@ -184,6 +233,15 @@ function draw(gl, programInfo, tunnelInfo) {
 			programInfo.uniformLocations.modelViewMatrix,
 			false,
 			modelViewMatrix);
+
+	// Tell WebGL we want to affect texture unit 0
+	gl.activeTexture(gl.TEXTURE0);
+
+	// Bind the texture to texture unit 0
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+
+	// Tell the shader we bound the texture to texture unit 0
+	gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
 	{
 		const vertexCount = buffers.length;

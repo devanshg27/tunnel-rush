@@ -10,6 +10,7 @@ var TEMPLATE_PATH = path.resolve(ROOT_PATH, 'src/index.html');
 var SHADER_PATH = path.resolve(ROOT_PATH, 'src/shaders');
 var BUILD_PATH = path.resolve(ROOT_PATH, 'dist');
 
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 var debug = process.env.NODE_ENV !== 'production';
 
 module.exports = {
@@ -25,7 +26,8 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       __DEV__: debug
-    })
+    }),
+    new CopyWebpackPlugin([ { from: 'src/assets', to: 'assets' } ])
   ],
   resolve: {
     root: [JS_PATH, SRC_PATH]

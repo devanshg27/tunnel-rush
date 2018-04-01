@@ -59,8 +59,8 @@ else {
 	requestAnimationFrame(render);
 }
 
-var cameraPosition = 0, cameraAngle = 0;
-
+var cameraPosition = 0, cameraAngle = 0, radius = 3.8, radiusVel = 0;
+var currentlyPressedKeys = {};
 //
 // Draw the scene.
 //
@@ -102,7 +102,7 @@ function drawScene(gl, programInfo, deltaTime) {
 	ForwardDir = tunnelHelper.getForwardDirection(tunnel1, cameraPosition);
 	var RadialDir = tunnelHelper.getUpDirection(tunnel1, cameraPosition, cameraAngle);
 	var cameraPos = glm.vec3.create();
-	glm.vec3.scaleAndAdd(cameraPos, curCentre, RadialDir, 3.5);
+	glm.vec3.scaleAndAdd(cameraPos, curCentre, RadialDir, radius);
 	glm.vec3.add(nxtCentre, cameraPos, ForwardDir);
 	glm.mat4.lookAt(tempMatrix, cameraPos, nxtCentre, [curCentre[0] - cameraPos[0], curCentre[1] - cameraPos[1], curCentre[2] - cameraPos[2]]);
 	// glm.mat4.lookAt(tempMatrix, [0, 0, 300], [0, 0, -6], [0, 1, 0]);
@@ -142,4 +142,29 @@ function drawScene(gl, programInfo, deltaTime) {
 		placedObstacle = true;
 		obstacle1 = new cubeHelper.makeCube(tunnelHelper.getPosition(tunnel1, 90), 0, [7, 1, 1], 0);
 	}
+	radius += radiusVel;
+	radiusVel += 0.02;
+	if(radius >= 3.8) radius = 3.8;
+	if (currentlyPressedKeys[37]) {
+		// Left cursor key
+		cameraAngle -= -0.02;
+    }
+    if (currentlyPressedKeys[39]) {
+		// Right cursor key
+		cameraAngle += -0.02;
+    }
+}
+
+document.onkeydown = handleKeyDown;
+document.onkeyup = handleKeyUp;
+
+function handleKeyDown(event) {
+	currentlyPressedKeys[event.keyCode] = true;
+	if (event.keyCode == 32 && radius >= 3.8) {
+		radiusVel = -0.3;
+	}
+}
+
+function handleKeyUp(event) {
+	currentlyPressedKeys[event.keyCode] = false;
 }

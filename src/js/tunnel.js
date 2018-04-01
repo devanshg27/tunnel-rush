@@ -102,17 +102,17 @@ function initBuffers(gl) {
 
 			var tempX = Math.floor(Math.random()*3)/3;
 			var tempY = Math.floor(Math.random()*3)/3;
-			texCods[8*(i*8 + j) + 0] = tempX+0.1;
-			texCods[8*(i*8 + j) + 1] = tempY+0.1;
+			texCods[8*(i*8 + j) + 0] = tempX+0.01;
+			texCods[8*(i*8 + j) + 1] = tempY+0.01;
 
-			texCods[8*(i*8 + j) + 2] = tempX+1/3-0.1;
-			texCods[8*(i*8 + j) + 3] = tempY+0.1;
+			texCods[8*(i*8 + j) + 2] = tempX+1/3-0.01;
+			texCods[8*(i*8 + j) + 3] = tempY+0.01;
 
-			texCods[8*(i*8 + j) + 4] = tempX+0.1;
-			texCods[8*(i*8 + j) + 5] = tempY+1/3-0.1;
+			texCods[8*(i*8 + j) + 4] = tempX+0.01;
+			texCods[8*(i*8 + j) + 5] = tempY+1/3-0.01;
 
-			texCods[8*(i*8 + j) + 6] = tempX+1/3-0.1;
-			texCods[8*(i*8 + j) + 7] = tempY+1/3-0.1;
+			texCods[8*(i*8 + j) + 6] = tempX+1/3-0.01;
+			texCods[8*(i*8 + j) + 7] = tempY+1/3-0.01;
 		}
 	}
 

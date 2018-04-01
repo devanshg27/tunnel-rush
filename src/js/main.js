@@ -36,6 +36,7 @@ else {
 			uSampler: gl.getUniformLocation(shaderProgram, 'uSampler'),
 			grFlag: gl.getUniformLocation(shaderProgram, 'grFlag'),
 			vFlash: gl.getUniformLocation(shaderProgram, 'vFlash'),
+			camPos: gl.getUniformLocation(shaderProgram, 'camPos'),
 		},
 	};
 
@@ -128,11 +129,12 @@ function drawScene(gl, programInfo, deltaTime) {
 		gl.uniform1i(programInfo.uniformLocations.grFlag, 0);
 	}
 	if(60 <= cameraPosition && cameraPosition <= 80) {
-		gl.uniform1f(programInfo.uniformLocations.vFlash, 2 - Math.abs((cameraPosition-60))/20);
+		gl.uniform1f(programInfo.uniformLocations.vFlash, 5 - Math.abs((cameraPosition-60))/5);
 	}
 	else {
 		gl.uniform1f(programInfo.uniformLocations.vFlash, 1);
 	}
+	gl.uniform3f(programInfo.uniformLocations.camPos, cameraPos[0], cameraPos[1], cameraPos[2]);
 
 	cubeHelper.draw(gl, programInfo, obstacle1);
 	tunnelHelper.draw(gl, programInfo, tunnel1);

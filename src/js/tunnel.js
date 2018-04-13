@@ -68,7 +68,7 @@ function initBuffers(gl) {
 	// Create a buffer for the cube's vertex positions.
 
 	const positionBuffer = gl.createBuffer();
-	texture = loadTexture(gl, 'assets/cubetexture.png');
+	texture = loadTexture(gl, 'assets/brick_texture.jpg');
 
 	// Select the positionBuffer as the one to apply buffer
 	// operations to from here out.

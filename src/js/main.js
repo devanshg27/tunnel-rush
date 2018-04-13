@@ -64,7 +64,7 @@ else {
 	requestAnimationFrame(render);
 }
 
-var cameraPosition = 0, cameraAngle = 0, radius = 3.8, radiusVel = 0, cameraPosSpeed = 30;
+var cameraPosition = 0, cameraAngle = 0, radius = 3.8, radiusVel = 0, cameraPosSpeed = 18;
 var currentlyPressedKeys = {};
 //
 // Draw the scene.
@@ -190,7 +190,7 @@ document.onkeyup = handleKeyUp;
 function handleKeyDown(event) {
 	currentlyPressedKeys[event.keyCode] = true;
 	if (event.keyCode == 32 && radius >= 3.8) {
-		radiusVel = -0.3;
+		radiusVel = -0.36;
 	}
 }
 
